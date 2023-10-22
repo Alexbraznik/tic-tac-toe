@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "./App.css";
 
-function App() {
+function useGameState() {
   const symbol_X = "X";
   const symbol_O = "O";
 
@@ -42,7 +42,6 @@ function App() {
     setDetermineWinner(null);
     setStepName("Ход: ");
   };
-
   function calculateWinner(cell) {
     const lines = [
       [0, 1, 2],
@@ -62,29 +61,40 @@ function App() {
     }
     return null;
   }
+  return {
+    symbol_X,
+    symbol_O,
+    stateArr,
+    currentStep,
+    determineWinner,
+    stepName,
+    handleClick,
+    resetClick,
+    calculateWinner,
+  };
+}
+
+function App() {
+  const {
+    stateArr,
+    currentStep,
+    determineWinner,
+    stepName,
+    handleClick,
+    resetClick,
+  } = useGameState();
 
   return (
     <div className="App">
       <div className="container">
-        <h1>
-          {stepName === "Ничья" ? "Ничья" : stepName}
-          <span className={`step--${currentStep}`}>
-            {stepName === "Ничья"
-              ? ""
-              : determineWinner
-              ? determineWinner
-              : currentStep}
-          </span>
-        </h1>
+        <GameInfo
+          stepName={stepName}
+          currentStep={currentStep}
+          determineWinner={determineWinner}
+        />
         <div className="cell-container">
           {stateArr.map((el, index) => (
-            <div
-              key={index}
-              onClick={() => handleClick(index)}
-              className={`cell step--${el === symbol_X ? symbol_X : symbol_O}`}
-            >
-              {el}
-            </div>
+            <GameCell el={el} onClick={() => handleClick(index)} />
           ))}
         </div>
         <button onClick={resetClick} className="reset">
@@ -95,4 +105,27 @@ function App() {
   );
 }
 
+function GameInfo({ stepName, currentStep, determineWinner }) {
+  return (
+    <h1>
+      {stepName === "Ничья" ? "Ничья" : stepName}
+      <span className={`step--${currentStep}`}>
+        {stepName === "Ничья"
+          ? ""
+          : determineWinner
+          ? determineWinner
+          : currentStep}
+      </span>
+    </h1>
+  );
+}
+
+function GameCell({ onClick, el }) {
+  const currentSymbol = el === "X" ? "X" : "O";
+  return (
+    <div onClick={onClick} className={`cell step--${currentSymbol} `}>
+      {el}
+    </div>
+  );
+}
 export default App;
